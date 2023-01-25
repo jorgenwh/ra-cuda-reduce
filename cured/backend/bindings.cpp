@@ -25,12 +25,19 @@ PYBIND11_MODULE(cured_backend, m)
     int *ret_data = ret.mutable_data();
 
     reduce::ragged_array_row_wise_sum_reduce(
-        data, ra_size, row_starts_data, row_lengths_data, num_rows, ret_data);
+        data, ra_size, row_starts_data, row_lengths_data, num_rows, ret_data, false);
 
     return ret;
   });
-  m.def("cp_ra_row_wise_sum_reduce", []()
+  m.def("cp_ra_row_wise_sum_reduce", [](long data_ptr, const int ra_size, 
+        long row_starts_ptr, long row_lengths_ptr, const int num_rows, long ret_ptr)
   {
-    return 0;
+    const int *data = reinterpret_cast<int*>(data_ptr);
+    const int *row_starts = reinterpret_cast<int*>(row_starts_ptr);
+    const int *row_lengths = reinterpret_cast<int*>(row_lengths_ptr);
+    int *ret = reinterpret_cast<int*>(ret_ptr);
+
+    reduce::ragged_array_row_wise_sum_reduce(
+        data, ra_size, row_starts, row_lengths, num_rows, ret, true);
   });
 }
